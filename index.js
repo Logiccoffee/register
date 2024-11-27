@@ -31,14 +31,14 @@ async function registerUser(event) {
         Password: password
     };
 
-    // Directly pass the URL to postJSON
     postJSON('https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register', '', '', user, function(response) {
         if (response.status === 200) {
             alert('Pendaftaran berhasil! Silakan login.');
-            // Optionally, redirect the user to the login page
             window.location.href = 'https://logiccoffee.id.biz.id/login';
         } else {
             alert(`Error: ${response.data.Response}`);
         }
-    });
+    }, {
+        "Content-Type": "application/json" // Pastikan hanya mengirimkan yang sesuai
+    });    
 }
