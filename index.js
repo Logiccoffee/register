@@ -1,3 +1,7 @@
+import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.js';
+import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
+import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
+
 async function registerUser(event) {
     event.preventDefault(); // Prevent the default form submission
 
@@ -31,14 +35,38 @@ async function registerUser(event) {
         Password: password
     };
 
-    postJSON("https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register", '', '', user, function(response) {
-        if (response.status === 200) {
-            alert('Pendaftaran berhasil! Silakan login.');
-            window.location.href = 'https://logiccoffee.id.biz.id/login';
-        } else {
-            alert(`Error: ${response.data.Response}`);
+    // Add Content-Type header to the request
+    postJSON(
+        "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
+        '', '', // No tokenkey and tokenvalue
+        user,
+        function (response) {
+            if (response.status === 200) {
+                alert('Pendaftaran berhasil! Silakan login.');
+                window.location.href = 'https://logiccoffee.id.biz.id/login';
+            } else {
+                alert(`Error: ${response.data.Response}`);
+            }
+        },
+        {
+            "Content-Type": "application/json"
         }
-    }, {
-        "Content-Type": "application/json" // Pastikan hanya mengirimkan yang sesuai
-    });    
+    );
 }
+
+// Assign the registerUser function to a button with ID "register-button" using onClick
+onClick("register-button", registerUser);
+
+// Add Enter key listener for form submission
+document.getElementById("register-form").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); // Prevent the default behavior
+        registerUser(event); // Trigger registerUser function
+    }
+});
+
+// Validate phone number input on the fly
+const phoneNumberInput = document.getElementById("register-phone");
+phoneNumberInput.addEventListener("input", () => {
+    validatePhoneNumber(phoneNumberInput); // Automatically format the phone number
+});
