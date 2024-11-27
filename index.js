@@ -57,14 +57,6 @@ async function registerUser(event) {
 // Assign the registerUser function to a button with ID "register-button" using onClick
 onClick("register-button", registerUser);
 
-// Add Enter key listener for form submission
-document.getElementById("register-form").addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        event.preventDefault(); // Prevent the default behavior
-        registerUser(event); // Trigger registerUser function
-    }
-});
-
 // Validate phone number input on the fly
 const phoneNumberInput = document.getElementById("register-phone");
 phoneNumberInput.addEventListener("input", () => {
