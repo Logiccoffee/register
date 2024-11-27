@@ -1,50 +1,44 @@
-import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.js';
-import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
+async function registerUser(event) {
+    event.preventDefault(); // Prevent the default form submission
 
-// Fungsi untuk menangani pendaftaran user
-function registerUser(event) {
-    event.preventDefault(); // Mencegah form melakukan reload halaman
-
-    // Ambil nilai dari input form
+    // Get form values
     const name = document.getElementById("register-name").value.trim();
-    const phoneNumber = document.getElementById("register-phone").value.trim();
+    const phone = document.getElementById("register-phone").value.trim();
     const email = document.getElementById("register-email").value.trim();
     const password = document.getElementById("register-password").value.trim();
 
-    // Validasi input pengguna
-    if (!name || !phoneNumber || !email || !password) {
-        alert("Semua field wajib diisi!");
+    // Define validation rules using jscroot
+    const validationRules = {
+        name: required(name, 'Nama is required'),
+        phone: required(phone, 'Nomor Hp is required') && isPhone(phone, 'Nomor Hp must be valid'),
+        email: required(email, 'Email is required') && isEmail(email, 'Email is not valid'),
+        password: required(password, 'Password is required')
+    };
+
+    // Validate form data
+    const validationResults = validate(validationRules);
+
+    if (!validationResults.isValid) {
+        alert(validationResults.errors.join("\n"));
         return;
     }
 
-    // Data yang akan dikirim ke backend
-    const userData = {
+    // Create the user object to send to the backend
+    const user = {
         Name: name,
-        PhoneNumber: phoneNumber,
+        PhoneNumber: phone,
         Email: email,
-        Password: password,
+        Password: password
     };
 
-    // URL endpoint registrasi
-    const targetUrl = "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register";
-
-    // Kirim data menggunakan fungsi postJSON
-    postJSON(targetUrl, userData, function (response) {
-        const { status, data } = response;
-
-        // Tampilkan hasil berdasarkan status respons
-        if (status === 200) {
-            alert("Registrasi berhasil! Silakan masuk dengan akun Anda.");
-            console.log(data);
-            window.location.href = "https://logiccoffee.id.biz.id/login"; // Redirect ke halaman login
+    // Directly pass the URL to postJSON
+    postJSON('https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register', '', '', user, function(response) {
+        if (response.status === 200) {
+            alert('Pendaftaran berhasil! Silakan login.');
+            // Optionally, redirect the user to the login page
+            window.location.href = 'https://logiccoffee.id.biz.id/login';
         } else {
-            alert(`Registrasi gagal: ${data.response || "Terjadi kesalahan pada server."}`);
-            console.error(data);
+            alert(`Error: ${response.data.Response}`);
         }
     });
 }
-
-// Bind fungsi registerUser ke tombol dengan ID 'register-button'
-document.addEventListener('DOMContentLoaded', () => {
-    onClick('register-button', registerUser);
-});
