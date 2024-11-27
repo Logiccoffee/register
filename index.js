@@ -2,6 +2,32 @@ import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.j
 import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
 import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
+// Fungsi untuk validasi required
+function required(value, message) {
+    if (!value || value.trim() === "") {
+        return message;
+    }
+    return true;
+}
+
+// Fungsi untuk validasi nomor telepon
+function isPhone(value, message) {
+    const phoneRegex = /^[0-9]{10,12}$/;
+    if (!phoneRegex.test(value)) {
+        return message;
+    }
+    return true;
+}
+
+// Fungsi untuk validasi email
+function isEmail(value, message) {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailRegex.test(value)) {
+        return message;
+    }
+    return true;
+}
+
 async function registerUser(event) {
     event.preventDefault(); // Prevent the default form submission
 
