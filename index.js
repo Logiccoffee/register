@@ -9,7 +9,7 @@ async function registerUser(event) {
     const email = getValue('register-email');
     const password = getValue('register-password');
 
-    // Simple validation
+    // Validasi sederhana
     if (!name || !phone || !email || !password) {
         alert('Please fill in all fields');
         return;
@@ -26,8 +26,8 @@ async function registerUser(event) {
         const response = await new Promise((resolve, reject) => {
             postJSON(
                 'https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register',
-                '', // Token key (not required in this case)
-                '', // Token value (not required in this case)
+                null, // Token key (kosong jika tidak ada token)
+                null, // Token value (kosong jika tidak ada token)
                 userData,
                 (result) => resolve(result),
             );
