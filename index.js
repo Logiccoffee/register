@@ -31,7 +31,7 @@ async function registerUser(event) {
         Password: password
     };
 
-    postJSON('https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register', '', '', user, function(response) {
+    postJSON("https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register", '', '', user, function(response) {
         if (response.status === 200) {
             alert('Pendaftaran berhasil! Silakan login.');
             window.location.href = 'https://logiccoffee.id.biz.id/login';
