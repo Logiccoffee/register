@@ -22,7 +22,7 @@ function isPhone(value, message) {
 // Fungsi untuk menangani pendaftaran user
 document.addEventListener("DOMContentLoaded", function () {
     const backend = {
-        register: "https://logiccoffee.api/register", // Ganti dengan URL endpoint backend sebenarnya
+        register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register", // Ganti dengan URL endpoint backend sebenarnya
     };
 
     const registerForm = document.querySelector(".register-form");
