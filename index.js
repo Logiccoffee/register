@@ -19,90 +19,96 @@ function isPhone(value, message) {
     return true;
 }
 
-// Fungsi untuk validasi email
-function isEmail(value, message) {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zAZ0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if (!emailRegex.test(value)) {
-        return message;
-    }
-    return true;
-}
-
-// Seleksi elemen input dan form
+// Fungsi untuk menangani pendaftaran user
 document.addEventListener("DOMContentLoaded", function () {
-    const getEmail = document.querySelector("input[name='Email']");
-    const getName = document.querySelector("input[name='Name']");
-    const getPassword = document.querySelector("input[name='Password']");
-    const getPhoneNumber = document.querySelector("input[name='PhoneNumber']");
+    const backend = {
+        register: "https://logiccoffee.api/register", // Ganti dengan URL endpoint backend sebenarnya
+    };
+
     const registerForm = document.querySelector(".register-form");
 
-    // Validate phone number input on the fly
-    const phoneNumberInput = document.getElementById("register-phone");
-    if (phoneNumberInput) {
-        phoneNumberInput.addEventListener("input", () => {
-            validatePhoneNumber(phoneNumberInput); // Automatically format the phone number
-        });
-    }
-
-    // Menambahkan event listener untuk submit form
     if (registerForm) {
-        registerForm.addEventListener("submit", registerUser);
-    }
+        registerForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-    // Fungsi untuk menangani pendaftaran user
-    async function registerUser(event) {
-        event.preventDefault(); // Prevent the default form submission
+            // Seleksi input form
+            const getEmail = document.querySelector("input[name='Email']");
+            const getName = document.querySelector("input[name='Name']");
+            const getPassword = document.querySelector("input[name='Password']");
+            const getPhoneNumber = document.querySelector("input[name='PhoneNumber']");
 
-        // Validasi inputan
-        const emailValidation = required(getEmail.value, "Email harus diisi");
-        if (emailValidation !== true) {
-            alert(emailValidation);
-            return;
-        }
-
-        const nameValidation = required(getName.value, "Nama harus diisi");
-        if (nameValidation !== true) {
-            alert(nameValidation);
-            return;
-        }
-
-        const passwordValidation = required(getPassword.value, "Password harus diisi");
-        if (passwordValidation !== true) {
-            alert(passwordValidation);
-            return;
-        }
-
-        const phoneValidation = isPhone(getPhoneNumber.value, "Nomor telepon tidak valid");
-        if (phoneValidation !== true) {
-            alert(phoneValidation);
-            return;
-        }
-
-        // Membuat objek user untuk dikirim ke backend
-        const user = {
-            Name: getName.value,
-            PhoneNumber: getPhoneNumber.value,
-            Email: getEmail.value,
-            Password: getPassword.value
-        };
-
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
-
-        // Panggil postJSON untuk mengirim data ke server
-        postJSON(
-            "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
-            '', '', // Tidak memerlukan tokenkey dan tokenvalue
-            user,
-            function (response) {
-                if (response.status === 200) {
-                    alert('Pendaftaran berhasil! Silakan login.');
-                    window.location.href = 'https://logiccoffee.id.biz.id/login';
-                } else {
-                    alert(`Error: ${response.data.Response}`);
-                }
+            // Validasi inputan
+            const emailValidation = required(getEmail.value, "Email harus diisi");
+            if (emailValidation !== true) {
+                Swal.fire("Gagal", emailValidation, "error");
+                return;
             }
-        );
+
+            const nameValidation = required(getName.value, "Nama harus diisi");
+            if (nameValidation !== true) {
+                Swal.fire("Gagal", nameValidation, "error");
+                return;
+            }
+
+            const passwordValidation = required(getPassword.value, "Password harus diisi");
+            if (passwordValidation !== true) {
+                Swal.fire("Gagal", passwordValidation, "error");
+                return;
+            }
+
+            const phoneValidation = isPhone(getPhoneNumber.value, "Nomor telepon tidak valid");
+            if (phoneValidation !== true) {
+                Swal.fire("Gagal", phoneValidation, "error");
+                return;
+            }
+
+            // Data yang akan dikirim ke server
+            const datajson = {
+                Email: getEmail.value,
+                Name: getName.value,
+                Password: getPassword.value,
+                PhoneNumber: getPhoneNumber.value,
+            };
+
+            // Konfigurasi request
+            const requestOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(datajson),
+            };
+
+            try {
+                // Kirim data ke server
+                const response = await fetch(backend.register, requestOptions);
+                const result = await response.json();
+
+                if (response.status === 200) {
+                    Swal.fire({
+                        title: "Pendaftaran Berhasil",
+                        text: "Anda berhasil mendaftar. Silakan login untuk melanjutkan.",
+                        icon: "success",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/login";
+                        }
+                    });
+                } else {
+                    Swal.fire("Gagal Mendaftar", result.message || "Terjadi kesalahan.", "info");
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire("Error", "Something went wrong!", "error");
+            }
+        });
+
+        // Validasi dan format nomor telepon saat input
+        const phoneNumberInput = document.querySelector("input[name='PhoneNumber']");
+        if (phoneNumberInput) {
+            phoneNumberInput.addEventListener("input", () => {
+                validatePhoneNumber(phoneNumberInput); // Automatically format phone number
+            });
+        }
     }
 });
