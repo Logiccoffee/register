@@ -80,3 +80,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
        
+Swal.fire('SweetAlert2 sudah berfungsi!');
