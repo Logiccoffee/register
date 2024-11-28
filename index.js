@@ -76,7 +76,7 @@ async function registerUser(event) {
 
     // Call postJSON without specifying the header explicitly (it will be handled by the library)
     postJSON(
-        "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
+        "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/data/user",
         '', '', // No tokenkey and tokenvalue needed
         user,
         function(response) {
