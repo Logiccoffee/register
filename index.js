@@ -20,7 +20,7 @@ function required(value, message) {
 
 // Fungsi untuk validasi nomor telepon
 function isPhone(value, message) {
-    const phoneRegex = /^[0-9]{10,12}$/;
+    const phoneRegex = /^62[0-9]{8,15}$/;
     if (!phoneRegex.test(value)) {
         return message;
     }
