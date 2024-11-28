@@ -2,6 +2,14 @@ import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.j
 import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
 import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
+onClick("register-button", registerUser);
+
+// Validate phone number input on the fly
+const phoneNumberInput = document.getElementById("register-phone");
+phoneNumberInput.addEventListener("input", () => {
+    validatePhoneNumber(phoneNumberInput); // Automatically format the phone number
+});
+
 // Fungsi untuk validasi required
 function required(value, message) {
     if (!value || value.trim() === "") {
@@ -37,19 +45,24 @@ async function registerUser(event) {
     const email = document.getElementById("register-email").value.trim();
     const password = document.getElementById("register-password").value.trim();
 
-    // Define validation rules using jscroot
-    const validationRules = {
-        name: required(name, 'Nama is required'),
-        phone: required(phone, 'Nomor Hp is required') && isPhone(phone, 'Nomor Hp must be valid'),
-        email: required(email, 'Email is required') && isEmail(email, 'Email is not valid'),
-        password: required(password, 'Password is required')
-    };
+    // Validasi manual
+    if (required(name, 'Nama is required') !== true) {
+        alert('Nama is required');
+        return;
+    }
 
-    // Validate form data
-    const validationResults = validate(validationRules);
+    if (required(phone, 'Nomor Hp is required') !== true || isPhone(phone, 'Nomor Hp must be valid') !== true) {
+        alert('Nomor Hp must be valid');
+        return;
+    }
 
-    if (!validationResults.isValid) {
-        alert(validationResults.errors.join("\n"));
+    if (required(email, 'Email is required') !== true || isEmail(email, 'Email is not valid') !== true) {
+        alert('Email is not valid');
+        return;
+    }
+
+    if (required(password, 'Password is required') !== true) {
+        alert('Password is required');
         return;
     }
 
@@ -79,12 +92,3 @@ async function registerUser(event) {
         }
     );
 }
-
-// Assign the registerUser function to a button with ID "register-button" using onClick
-onClick("register-button", registerUser);
-
-// Validate phone number input on the fly
-const phoneNumberInput = document.getElementById("register-phone");
-phoneNumberInput.addEventListener("input", () => {
-    validatePhoneNumber(phoneNumberInput); // Automatically format the phone number
-});
