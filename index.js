@@ -40,31 +40,23 @@ async function registerUser(event) {
     event.preventDefault(); // Prevent the default form submission
 
     // Get form values
-    const name = document.getElementById("register-name").value.trim();
-    const phone = document.getElementById("register-phone").value.trim();
-    const email = document.getElementById("register-email").value.trim();
-    const password = document.getElementById("register-password").value.trim();
+    const getEmail = document.querySelector("input[name='Email']");
+  const getName = document.querySelector("input[name='Name']");
+  const getPassword = document.querySelector("input[name='Password']");
+  const getPhoneNumber = document.querySelector("input[name='PhoneNumber']");
 
-    // Validasi manual
-    if (required(name, 'Nama is required') !== true) {
-        alert('Nama is required');
-        return;
-    }
+  document.querySelector(".register-form").addEventListener("submit"), (e) => {
+    e.preventDefault();
 
-    if (required(phone, 'Nomor Hp is required') !== true || isPhone(phone, 'Nomor Hp must be valid') !== true) {
-        alert('Nomor Hp must be valid');
-        return;
-    }
+    const datajson = {
+      Email: getEmail.value,
+      Name: getName.value,
+      Password: getPassword.value,
+      PhoneNumber: getPhoneNumber.value,
+    };
 
-    if (required(email, 'Email is required') !== true || isEmail(email, 'Email is not valid') !== true) {
-        alert('Email is not valid');
-        return;
-    }
-
-    if (required(password, 'Password is required') !== true) {
-        alert('Password is required');
-        return;
-    }
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
 
     // Create the user object to send to the backend
     const user = {
@@ -72,11 +64,11 @@ async function registerUser(event) {
         PhoneNumber: phone,
         Email: email,
         Password: password
-    };
+    }};
 
     // Call postJSON without specifying the header explicitly (it will be handled by the library)
     postJSON(
-        "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/data/user",
+        "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
         '', '', // No tokenkey and tokenvalue needed
         user,
         function(response) {
