@@ -93,3 +93,6 @@ async function registerUser(event) {
         }
     );
 }
+
+// Menambahkan event listener untuk submit form
+document.querySelector(".register-form").addEventListener("submit", registerUser);
