@@ -74,21 +74,18 @@ async function registerUser(event) {
         Password: password
     };
 
-    // Add Content-Type header to the request
+    // Call postJSON without specifying the header explicitly (it will be handled by the library)
     postJSON(
         "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
-        '', '', // No tokenkey and tokenvalue
+        '', '', // No tokenkey and tokenvalue needed
         user,
-        function (response) {
+        function(response) {
             if (response.status === 200) {
                 alert('Pendaftaran berhasil! Silakan login.');
                 window.location.href = 'https://logiccoffee.id.biz.id/login';
             } else {
                 alert(`Error: ${response.data.Response}`);
             }
-        },
-        {
-            "Content-Type": "application/json"
         }
     );
 }
