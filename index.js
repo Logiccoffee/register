@@ -41,35 +41,47 @@ async function registerUser(event) {
 
     // Get form values
     const getEmail = document.querySelector("input[name='Email']");
-  const getName = document.querySelector("input[name='Name']");
-  const getPassword = document.querySelector("input[name='Password']");
-  const getPhoneNumber = document.querySelector("input[name='PhoneNumber']");
+    const getName = document.querySelector("input[name='Name']");
+    const getPassword = document.querySelector("input[name='Password']");
+    const getPhoneNumber = document.querySelector("input[name='PhoneNumber']");
 
-  document.querySelector(".register-form").addEventListener("submit"), (e) => {
-    e.preventDefault();
+    // Validasi inputan
+    const emailValidation = required(getEmail.value, "Email harus diisi");
+    if (emailValidation !== true) {
+        alert(emailValidation);
+        return;
+    }
 
-    const datajson = {
-      Email: getEmail.value,
-      Name: getName.value,
-      Password: getPassword.value,
-      PhoneNumber: getPhoneNumber.value,
+    const nameValidation = required(getName.value, "Nama harus diisi");
+    if (nameValidation !== true) {
+        alert(nameValidation);
+        return;
+    }
+
+    const passwordValidation = required(getPassword.value, "Password harus diisi");
+    if (passwordValidation !== true) {
+        alert(passwordValidation);
+        return;
+    }
+
+    const phoneValidation = isPhone(getPhoneNumber.value, "Nomor telepon tidak valid");
+    if (phoneValidation !== true) {
+        alert(phoneValidation);
+        return;
+    }
+
+    // Membuat objek user untuk dikirim ke backend
+    const user = {
+        Name: getName.value,
+        PhoneNumber: getPhoneNumber.value,
+        Email: getEmail.value,
+        Password: getPassword.value
     };
 
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    // Create the user object to send to the backend
-    const user = {
-        Name: name,
-        PhoneNumber: phone,
-        Email: email,
-        Password: password
-    }};
-
-    // Call postJSON without specifying the header explicitly (it will be handled by the library)
+    // Panggil postJSON untuk mengirim data ke server
     postJSON(
         "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
-        '', '', // No tokenkey and tokenvalue needed
+        '', '', // Tidak memerlukan tokenkey dan tokenvalue
         user,
         function(response) {
             if (response.status === 200) {
