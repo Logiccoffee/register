@@ -29,7 +29,7 @@ function isEmail(value, message) {
 }
 
 // Seleksi elemen input dan form
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const getEmail = document.querySelector("input[name='Email']");
     const getName = document.querySelector("input[name='Name']");
     const getPassword = document.querySelector("input[name='Password']");
@@ -86,12 +86,16 @@ document.addEventListener("DOMContentLoaded", function() {
             Password: getPassword.value
         };
 
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+
         // Panggil postJSON untuk mengirim data ke server
         postJSON(
             "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
             '', '', // Tidak memerlukan tokenkey dan tokenvalue
             user,
-            function(response) {
+            function (response) {
                 if (response.status === 200) {
                     alert('Pendaftaran berhasil! Silakan login.');
                     window.location.href = 'https://logiccoffee.id.biz.id/login';
