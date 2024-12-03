@@ -2,7 +2,7 @@ import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.j
 import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
 import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
-onClick("register-button", registerUser);
+onClick("register-button", handleRegisterUser);
 
 // Validate phone number input on the fly
 const phoneNumberInput = document.getElementById("register-phone");
@@ -11,21 +11,21 @@ phoneNumberInput.addEventListener("input", () => {
 });
 
 // Fungsi untuk validasi required
-function required(value, message) {
-    if (!value || value.trim() === "") {
-        return message;
-    }
-    return true;
-}
+// function required(value, message) {
+//     if (!value || value.trim() === "") {
+//         return message;
+//     }
+//     return true;
+// }
 
 // Fungsi untuk validasi nomor telepon
-function isPhone(value, message) {
-    const phoneRegex = /^62[0-9]{8,15}$/;
-    if (!phoneRegex.test(value)) {
-        return message;
-    }
-    return true;
-}
+// function isPhone(value, message) {
+//     const phoneRegex = /^62[0-9]{8,15}$/;
+//     if (!phoneRegex.test(value)) {
+//         return message;
+//     }
+//     return true;
+// }
 
 // Fungsi untuk menangani pendaftaran user
 document.addEventListener("DOMContentLoaded", function () {
@@ -87,3 +87,23 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+// Fungsi untuk validasi email
+function isEmail(value, message) {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return emailRegex.test(value) || message;
+}
+
+// Fungsi untuk memproses nomor telepon
+function processPhoneNumber(phoneNumber) {
+    if (!validatePhoneNumber(phoneNumber)) {
+        return { valid: false, formatted: phoneNumber };
+    }
+
+    // Ganti awalan "08" menjadi "628" jika valid
+    if (phoneNumber.startsWith("08")) {
+        phoneNumber = phoneNumber.replace(/^08/, "628");
+    }
+
+    return { valid: true, formatted: phoneNumber };
+}
