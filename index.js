@@ -17,7 +17,8 @@ function isPhone(value, message) {
         return message;
     }
     return true;
-} 
+}
+
 // Fungsi untuk menangani pendaftaran user
 document.addEventListener("DOMContentLoaded", function () {
     const backend = {
