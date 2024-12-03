@@ -6,18 +6,11 @@ import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@mai
 onClick("register-button", registerUser);
 
 // Fungsi untuk memproses nomor telepon
-function processPhoneNumber(phoneNumber) {
-    if (!validatePhoneNumber(phoneNumber)) {
-        return { valid: false, formatted: phoneNumber };
-    }
-
-    // Ganti awalan "08" menjadi "628" jika valid
-    if (phoneNumber.startsWith("08")) {
-        phoneNumber = phoneNumber.replace(/^08/, "628");
-    }
-
-    return { valid: true, formatted: phoneNumber };
-}
+// Validate phone number input on the fly
+const phoneNumberInput = document.getElementById("register-phone");
+phoneNumberInput.addEventListener("input", () => {
+    validatePhoneNumber(phoneNumberInput); // Automatically format the phone number
+});
 
 
 // Fungsi untuk validasi required
