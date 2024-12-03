@@ -88,12 +88,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-// Fungsi untuk validasi email
-function isEmail(value, message) {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    return emailRegex.test(value) || message;
-}
-
 // Fungsi untuk memproses nomor telepon
 function processPhoneNumber(phoneNumber) {
     if (!validatePhoneNumber(phoneNumber)) {
