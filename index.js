@@ -2,17 +2,6 @@ import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.j
 import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
 import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
-
-onClick("register-button", registerUser);
-
-// Fungsi untuk memproses nomor telepon
-// Validate phone number input on the fly
-const phoneNumberInput = document.getElementById("register-phone");
-phoneNumberInput.addEventListener("input", () => {
-    validatePhoneNumber(phoneNumberInput); // Automatically format the phone number
-});
-
-
 // Fungsi untuk validasi required
 function required(value, message) {
     if (!value || value.trim() === "") {
@@ -29,8 +18,6 @@ function isPhone(value, message) {
     }
     return true;
 } 
-
-
 // Fungsi untuk menangani pendaftaran user
 document.addEventListener("DOMContentLoaded", function () {
     const backend = {
@@ -44,39 +31,33 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
 
             // Ambil nilai input form
-            const getEmail = document.querySelector("input[name='Email']").value.trim();
-            const getName = document.querySelector("input[name='Name']").value.trim();
-            const getPassword = document.querySelector("input[name='Password']").value.trim();
-            const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value.trim();
-
-            // Validasi input
-            if (!getName || !getEmail || !getPassword || !getPhoneNumber) {
-                Swal.fire("Error", "Semua kolom harus diisi.", "error");
-                return;
-            }
-
-            if (!isEmail(getEmail, "Email tidak valid")) {
-                Swal.fire("Error", "Format email tidak valid.", "error");
-                return;
-            }
-
-            const phoneResult = processPhoneNumber(getPhoneNumber);
-            if (!phoneResult.valid) {
-                Swal.fire("Error", "Nomor telepon tidak valid.", "error");
-                return;
-            }
+            const getEmail = document.querySelector("input[name='Email']").value;
+            const getName = document.querySelector("input[name='Name']").value;
+            const getPassword = document.querySelector("input[name='Password']").value;
+            const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
 
             // Data yang akan dikirim ke server
             const datajson = {
                 Email: getEmail,
                 Name: getName,
                 Password: getPassword,
-                PhoneNumber: phoneResult.formatted,
+                PhoneNumber: getPhoneNumber,
+            };
+
+            // Konfigurasi request
+            const requestOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", // Hanya gunakan header yang valid
+                },
+                body: JSON.stringify(datajson), // Konversi objek ke JSON
             };
 
             try {
                 // Kirim data ke server
-                const response = await postJSON(backend.register, datajson);
+                const response = await fetch(backend.register, requestOptions);
+                const result = await response.json();
+
                 if (response.status === 200) {
                     Swal.fire({
                         title: "Pendaftaran Berhasil",
@@ -88,18 +69,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
                     });
                 } else {
-                    Swal.fire("Gagal Mendaftar", response.message || "Terjadi kesalahan.", "info");
+                    Swal.fire("Gagal Mendaftar", result.message || "Terjadi kesalahan.", "info");
                 }
             } catch (error) {
                 console.error(error);
-                Swal.fire("Error", "Terjadi kesalahan pada server.", "error");
+                Swal.fire("Error", "Something went wrong!", "error");
             }
         });
     }
 });
-
-// Fungsi validasi email
-function isEmail(value, message) {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    return emailRegex.test(value) || message;
-}
