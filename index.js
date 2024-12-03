@@ -2,6 +2,14 @@ import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.j
 import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
 import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
+onClick("register-button", registerUser);
+
+// Validate phone number input on the fly
+const phoneNumberInput = document.getElementById("register-phone");
+phoneNumberInput.addEventListener("input", () => {
+    validatePhoneNumber(phoneNumberInput); // Automatically format the phone number
+});
+
 // Fungsi untuk validasi required
 function required(value, message) {
     if (!value || value.trim() === "") {
