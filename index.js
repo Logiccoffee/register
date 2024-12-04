@@ -3,15 +3,13 @@ import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@mai
 
 onClick("register-button", registerUser);
 
-// Validate phone number input on the fly
-const phoneNumberInput = document.getElementById("register-phone");
-if (phoneNumberInput) {
-    phoneNumberInput.addEventListener("input", () => {
-        const phoneValidation = validatePhoneNumber(phoneNumberInput.value);
-        if (phoneValidation.valid) {
-            phoneNumberInput.value = phoneValidation.value; // Update input with formatted phone number
-        }
-    });
+// Fungsi untuk validasi nomor telepon
+function isPhone(value, message) {
+    const phoneRegex = /^62[0-9]{8,15}$/;
+    if (!phoneRegex.test(value)) {
+        return message;
+    }
+    return true;
 }
 
 // Fungsi untuk menangani pendaftaran user
