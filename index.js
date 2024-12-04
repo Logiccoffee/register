@@ -60,7 +60,7 @@ onClick("#register-button", async (e) => {
     };
 
     try {
-        // Kirim data ke server menggunakan postJSON
+        // Menggunakan postJSON dari jscroot
         const response = await postJSON(backend.register, datajson);
 
         if (response.status === 200) {
@@ -69,13 +69,17 @@ onClick("#register-button", async (e) => {
                 text: "Silakan login menggunakan WhatsAuth untuk melanjutkan.",
                 icon: "success",
             }).then(() => {
-                window.location.href = "/login";
+                window.location.href = "/login"; // Ganti dengan URL halaman login
             });
         } else {
-            Swal.fire("Gagal Mendaftar", response.message || "Terjadi kesalahan.", "info");
+            Swal.fire(
+                "Error",
+                response.message || "Terjadi kesalahan pada server.",
+                "error"
+            );
         }
     } catch (error) {
-        console.error(error);
-        Swal.fire("Error", "Terjadi kesalahan saat menghubungi server.", "error");
+        console.error("Error:", error);
+        Swal.fire("Error", "Gagal menghubungi server. Periksa koneksi Anda.", "error");
     }
 });
