@@ -63,10 +63,17 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
-            // Menggunakan postJSON dari jscroot
-            const response = await postJSON(backend.register, datajson);
+            // Gunakan fetch untuk request
+            const response = await fetch(backend.register, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", // Set header yang benar
+                },
+                body: JSON.stringify(datajson),
+            });
 
-            if (response.status === 200) {
+            if (response.ok) {
+                const result = await response.json();
                 Swal.fire({
                     title: "Pendaftaran Berhasil",
                     text: "Silakan login menggunakan WhatsAuth untuk melanjutkan.",
@@ -75,9 +82,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     window.location.href = "/login"; // Ganti dengan URL halaman login
                 });
             } else {
+                const error = await response.json();
                 Swal.fire(
                     "Error",
-                    response.message || "Terjadi kesalahan pada server.",
+                    error.message || "Terjadi kesalahan pada server.",
                     "error"
                 );
             }
