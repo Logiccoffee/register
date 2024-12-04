@@ -2,12 +2,6 @@ import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.j
 import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
 import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
-// Validate phone number input on the fly
-const phoneNumberInput = document.getElementById("register-phone");
-phoneNumberInput.addEventListener("input", () => {
-    validatePhoneNumber(phoneNumberInput); // Automatically format the phone number
-});
-
 // Fungsi untuk validasi required
 function required(value, message) {
     if (!value || value.trim() === "") {
@@ -16,13 +10,21 @@ function required(value, message) {
     return true;
 }
 
-//Fungsi untuk validasi nomor telepon
+// Fungsi untuk validasi nomor telepon
 function isPhone(value, message) {
     const phoneRegex = /^62[0-9]{8,15}$/;
     if (!phoneRegex.test(value)) {
         return message;
     }
     return true;
+}
+
+// Fungsi untuk mengganti 08 dengan 628
+function formatPhoneNumber(phoneNumber) {
+    if (phoneNumber.startsWith("08")) {
+        return `62${phoneNumber.slice(1)}`;
+    }
+    return phoneNumber;
 }
 
 // Fungsi untuk menangani pendaftaran user
@@ -41,7 +43,16 @@ document.addEventListener("DOMContentLoaded", function () {
             const getEmail = document.querySelector("input[name='Email']").value;
             const getName = document.querySelector("input[name='Name']").value;
             const getPassword = document.querySelector("input[name='Password']").value;
-            const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
+            let getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
+
+            // Validasi dan format nomor telepon
+            getPhoneNumber = formatPhoneNumber(getPhoneNumber);
+
+            const isValidPhoneNumber = validatePhoneNumber(getPhoneNumber);
+            if (!isValidPhoneNumber) {
+                Swal.fire("Nomor Telepon Tidak Valid", "Masukkan nomor telepon yang benar!", "warning");
+                return;
+            }
 
             // Data yang akan dikirim ke server
             const datajson = {
@@ -83,19 +94,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 Swal.fire("Error", "Something went wrong!", "error");
             }
         });
+
+        // Tambahkan fungsi untuk mengganti nomor telepon secara otomatis saat pengguna mengetik
+        const phoneInput = document.querySelector("input[name='PhoneNumber']");
+        if (phoneInput) {
+            onClick(phoneInput, () => {
+                phoneInput.value = formatPhoneNumber(phoneInput.value);
+            });
+        }
     }
 });
-
-// Fungsi untuk memproses nomor telepon
-// function processPhoneNumber(phoneNumber) {
-//     if (!validatePhoneNumber(phoneNumber)) {
-//         return { valid: false, formatted: phoneNumber };
-//     }
-
-//     // Ganti awalan "08" menjadi "628" jika valid
-//     if (phoneNumber.startsWith("08")) {
-//         phoneNumber = phoneNumber.replace(/^08/, "628");
-//     }
-
-//     return { valid: true, formatted: phoneNumber };
-// }
