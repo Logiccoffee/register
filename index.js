@@ -8,13 +8,6 @@ function required(value, message) {
     return true;
 }
 
-// Fungsi validasi nomor telepon
-function validatePhoneNumber(phone) {
-    // Pastikan format nomor telepon dimulai dengan 62 dan diikuti dengan 8 hingga 15 digit
-    const phoneRegex = /^62\d{8,15}$/;
-    return phoneRegex.test(phone);
-}
-
 // Endpoint backend
 const backend = {
     register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
@@ -49,15 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const emailError = required(getEmail, "Email wajib diisi");
         const nameError = required(getName, "Nama wajib diisi");
         const passwordError = required(getPassword, "Password wajib diisi");
-        const phoneError =
-            getPhoneNumber && getPhoneNumber.trim() !== "" && validatePhoneNumber(getPhoneNumber)
-                ? true
-                : "Nomor telepon tidak valid. Harap gunakan format internasional.";
 
-        if (emailError !== true || nameError !== true || passwordError !== true || phoneError !== true) {
+        if (emailError !== true || nameError !== true || passwordError !== true) {
             Swal.fire(
                 "Error Validasi",
-                [emailError, nameError, passwordError, phoneError]
+                [emailError, nameError, passwordError]
                     .filter((msg) => msg !== true)
                     .join("\n"),
                 "warning"
@@ -70,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
             Email: getEmail,
             Name: getName,
             Password: getPassword,
-            PhoneNumber: getPhoneNumber,
+            PhoneNumber: getPhoneNumber, // Nomor telepon tidak divalidasi lagi
         };
 
         try {
