@@ -66,10 +66,9 @@ document.addEventListener("DOMContentLoaded", function () {
             };
 
             try {
-                // Kirim data ke server
                 const response = await fetch(backend.register, requestOptions);
-                const result = await response.json();
-
+                console.log("Status:", response.status);
+                console.log("Response Text:", await response.text());
                 if (response.status === 200) {
                     Swal.fire({
                         title: "Pendaftaran Berhasil",
@@ -77,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         icon: "success",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = "/login"; // Ganti dengan URL halaman login
+                            window.location.href = "/login";
                         }
                     });
                 } else {
