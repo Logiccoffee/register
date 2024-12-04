@@ -1,20 +1,17 @@
 import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.js';
-import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
 import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
-// Fungsi untuk validasi nomor telepon
-function validateAndConvertPhone(value) {
-    // Jika nomor dimulai dengan "08", ubah menjadi "62"
-    if (value.startsWith("08")) {
-        value = "62" + value.slice(1);
-    }
+onClick("register-button", registerUser);
 
-    // Validasi format menggunakan validatePhoneNumber dari jscroot
-    if (!validatePhoneNumber(value)) {
-        return { valid: false, value }; // Tidak valid
-    }
-
-    return { valid: true, value }; // Nomor valid dan terkonversi
+// Validate phone number input on the fly
+const phoneNumberInput = document.getElementById("register-phone");
+if (phoneNumberInput) {
+    phoneNumberInput.addEventListener("input", () => {
+        const phoneValidation = validatePhoneNumber(phoneNumberInput.value);
+        if (phoneValidation.valid) {
+            phoneNumberInput.value = phoneValidation.value; // Update input with formatted phone number
+        }
+    });
 }
 
 // Fungsi untuk menangani pendaftaran user
@@ -32,13 +29,13 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
 
             // Ambil nilai input form
-            const getEmail = document.querySelector("input[name='Email']").value;
-            const getName = document.querySelector("input[name='Name']").value;
-            const getPassword = document.querySelector("input[name='Password']").value;
-            let getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
+            const getEmail = document.querySelector("input[name='Email']").value.trim();
+            const getName = document.querySelector("input[name='Name']").value.trim();
+            const getPassword = document.querySelector("input[name='Password']").value.trim();
+            let getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value.trim();
 
             // Validasi nomor telepon
-            const phoneValidation = validateAndConvertPhone(getPhoneNumber);
+            const phoneValidation = validatePhoneNumber(getPhoneNumber);
             if (!phoneValidation.valid) {
                 Swal.fire("Error", "Nomor telepon tidak valid!", "error");
                 return;
@@ -67,8 +64,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             try {
                 const response = await fetch(backend.register, requestOptions);
+                const result = await response.json();
                 console.log("Status:", response.status);
-                console.log("Response Text:", await response.text());
+                console.log("Response:", result);
+
                 if (response.status === 200) {
                     Swal.fire({
                         title: "Pendaftaran Berhasil",
@@ -83,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     Swal.fire("Gagal Mendaftar", result.message || "Terjadi kesalahan.", "info");
                 }
             } catch (error) {
-                console.error(error);
+                console.error("Error:", error);
                 Swal.fire("Error", "Something went wrong!", "error");
             }
         });
