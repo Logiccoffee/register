@@ -1,54 +1,64 @@
 import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.js';
 
-document.addEventListener("DOMContentLoaded", () => {
+// Fungsi untuk menangani pendaftaran user
+document.addEventListener("DOMContentLoaded", function () {
     const backend = {
-        register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
+        register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register", // Ganti dengan URL endpoint backend sebenarnya
     };
 
-    // Fungsi untuk menangani pendaftaran
-    const registerUser = async () => {
-        // Ambil nilai input form
-        const getEmail = document.querySelector("input[name='Email']").value;
-        const getName = document.querySelector("input[name='Name']").value;
-        const getPassword = document.querySelector("input[name='Password']").value;
-        const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
+    const registerForm = document.querySelector(".register-form");
 
-        const datajson = {
-            Email: getEmail,
-            Name: getName,
-            Password: getPassword,
-            PhoneNumber: getPhoneNumber,
-        };
+    if (registerForm) {
+        registerForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        const requestOptions = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(datajson),
-        };
+            // Ambil nilai input form
+            const getEmail = document.querySelector("input[name='Email']").value;
+            const getName = document.querySelector("input[name='Name']").value;
+            const getPassword = document.querySelector("input[name='Password']").value;
+            const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
 
-        try {
-            const response = await fetch(backend.register, requestOptions);
-            const result = await response.json();
+            // Data yang akan dikirim ke server
+            const datajson = {
+                Email: getEmail,
+                Name: getName,
+                Password: getPassword,
+                PhoneNumber: getPhoneNumber,
+            };
 
-            if (response.status === 200) {
-                Swal.fire({
-                    title: "Pendaftaran Berhasil",
-                    text: "Silakan login menggunakan WhatsAuth untuk melanjutkan.",
-                    icon: "success",
-                }).then(() => {
-                    window.location.href = "/login";
-                });
-            } else {
-                Swal.fire("Gagal Mendaftar", result.message || "Terjadi kesalahan.", "info");
+            // Konfigurasi request
+            const requestOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", // Hanya gunakan header yang valid
+                },
+                body: JSON.stringify(datajson), // Konversi objek ke JSON
+            };
+
+            try {
+                // Kirim data ke server
+                const response = await fetch(backend.register, requestOptions);
+                const result = await response.json();
+
+                if (response.status === 200) {
+                    Swal.fire({
+                        title: "Pendaftaran Berhasil",
+                        text: "Silakan login menggunakan WhatsAuth untuk melanjutkan.",
+                        icon: "success",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/login"; // Ganti dengan URL halaman login
+                        }
+                    });
+                } else {
+                    Swal.fire("Gagal Mendaftar", result.message || "Terjadi kesalahan.", "info");
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire("Error", "Something went wrong!", "error");
             }
-        } catch (error) {
-            console.error(error);
-            Swal.fire("Error", "Something went wrong!", "error");
-        }
-    };
-
+        });
+    }
     // Menghubungkan tombol "Daftar" dengan fungsi registerUser
     onClick("register-button", registerUser); // Untuk tombol daftar
 });
