@@ -19,6 +19,25 @@ function isPhone(value, message) {
     return true;
 }
 
+// Fungsi untuk memvalidasi dan mengonversi nomor telepon
+function isPhone(value, message) {
+    // Cek jika nomor dimulai dengan "08" dan ubah ke "62"
+    if (value.startsWith("08")) {
+        value = "62" + value.slice(1);
+    }
+
+    // Gunakan validatePhoneNumber untuk memastikan format setelah diubah
+    if (!validatePhoneNumber(value)) {
+        return message;
+    }
+
+    // Update input agar data di form berubah ke format baru
+    document.querySelector("input[name='PhoneNumber']").value = value;
+
+    return true;
+}
+
+
 // Fungsi untuk menangani pendaftaran user
 document.addEventListener("DOMContentLoaded", function () {
     const backend = {
@@ -27,24 +46,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const registerForm = document.querySelector(".register-form");
 
-    // Tangani pengubahan otomatis awalan 08 menjadi 628
-    const phoneNumberInput = document.querySelector("input[name='PhoneNumber']");
-    if (phoneNumberInput) {
-        phoneNumberInput.addEventListener("input", () => {
-            if (phoneNumberInput.value.startsWith("08")) {
-                phoneNumberInput.value = phoneNumberInput.value.replace(/^08/, "628");
-            }
-            validatePhoneNumber(phoneNumberInput); // Validasi format nomor
-        });
-    }
+    if (registerForm) {
+        registerForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-    // Tangkap klik tombol daftar menggunakan onClick
-    onClick("register-button", async () => {
-        if (registerForm) {
+            // Ambil nilai input form
             const getEmail = document.querySelector("input[name='Email']").value;
             const getName = document.querySelector("input[name='Name']").value;
             const getPassword = document.querySelector("input[name='Password']").value;
-            const getPhoneNumber = phoneNumberInput.value;
+            const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
 
             // Data yang akan dikirim ke server
             const datajson = {
@@ -58,12 +68,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const requestOptions = {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json", // Hanya gunakan header yang valid
                 },
-                body: JSON.stringify(datajson),
+                body: JSON.stringify(datajson), // Konversi objek ke JSON
             };
 
             try {
+                // Kirim data ke server
                 const response = await fetch(backend.register, requestOptions);
                 const result = await response.json();
 
@@ -75,55 +86,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     }).then((result) => {
                         if (result.isConfirmed) {
                             window.location.href = "/login"; // Ganti dengan URL halaman login
-                        }
-                    });
-                } else {
-                    Swal.fire("Gagal Mendaftar", result.message || "Terjadi kesalahan.", "info");
-                }
-            } catch (error) {
-                console.error(error);
-                Swal.fire("Error", "Something went wrong!", "error");
-            }
-        }
-    });
-
-    // Tangani form submit jika user menekan enter
-    if (registerForm) {
-        registerForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const getEmail = document.querySelector("input[name='Email']").value;
-            const getName = document.querySelector("input[name='Name']").value;
-            const getPassword = document.querySelector("input[name='Password']").value;
-            const getPhoneNumber = phoneNumberInput.value;
-
-            const datajson = {
-                Email: getEmail,
-                Name: getName,
-                Password: getPassword,
-                PhoneNumber: getPhoneNumber,
-            };
-
-            const requestOptions = {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(datajson),
-            };
-
-            try {
-                const response = await fetch(backend.register, requestOptions);
-                const result = await response.json();
-
-                if (response.status === 200) {
-                    Swal.fire({
-                        title: "Pendaftaran Berhasil",
-                        text: "Silakan login menggunakan WhatsAuth untuk melanjutkan.",
-                        icon: "success",
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "/login";
                         }
                     });
                 } else {
