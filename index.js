@@ -1,5 +1,4 @@
 import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
-import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
 // Fungsi validasi input wajib diisi
 function required(value, message) {
@@ -7,6 +6,13 @@ function required(value, message) {
         return message;
     }
     return true;
+}
+
+// Fungsi validasi nomor telepon
+function validatePhoneNumber(phone) {
+    // Pastikan format nomor telepon dimulai dengan 62 dan diikuti dengan 8 hingga 15 digit
+    const phoneRegex = /^62\d{8,15}$/;
+    return phoneRegex.test(phone);
 }
 
 // Endpoint backend
