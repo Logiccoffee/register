@@ -1,6 +1,5 @@
 import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.js';
 import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
-import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
 // Fungsi untuk validasi required
 function required(value, message) {
@@ -19,64 +18,69 @@ function isPhone(value, message) {
     return true;
 }
 
-// Fungsi untuk menangani pendaftaran user
-document.addEventListener("DOMContentLoaded", function () {
-    const backend = {
-        register: "https://logiccoffee.api/register", // Ganti dengan URL endpoint backend sebenarnya
-        register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register", // Ganti dengan URL endpoint backend sebenarnya
+// URL endpoint backend
+const backend = {
+    register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register", // Ganti dengan URL endpoint backend sebenarnya
+};
+
+// Fungsi untuk menangani klik tombol daftar
+onClick("#btn-daftar", async () => {
+    // Ambil nilai input form
+    const getEmail = document.querySelector("input[name='Email']").value;
+    const getName = document.querySelector("input[name='Name']").value;
+    const getPassword = document.querySelector("input[name='Password']").value;
+    const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
+
+    // Validasi input
+    const errors = [
+        required(getEmail, "Email tidak boleh kosong"),
+        required(getName, "Nama tidak boleh kosong"),
+        required(getPassword, "Password tidak boleh kosong"),
+        isPhone(getPhoneNumber, "Nomor telepon tidak valid"),
+    ].filter((msg) => msg !== true);
+
+    if (errors.length > 0) {
+        Swal.fire("Validasi Gagal", errors.join("\n"), "warning");
+        return;
+    }
+
+    // Data yang akan dikirim ke server
+    const datajson = {
+        Email: getEmail,
+        Name: getName,
+        Password: getPassword,
+        PhoneNumber: getPhoneNumber,
     };
 
-    const registerForm = document.querySelector(".register-form");
+    // Konfigurasi request
+    const requestOptions = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json", // Hanya gunakan header yang valid
+        },
+        body: JSON.stringify(datajson), // Konversi objek ke JSON
+    };
 
-    if (registerForm) {
-        registerForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
+    try {
+        // Kirim data ke server
+        const response = await fetch(backend.register, requestOptions);
+        const result = await response.json();
 
-            // Ambil nilai input form
-            const getEmail = document.querySelector("input[name='Email']").value;
-            const getName = document.querySelector("input[name='Name']").value;
-            const getPassword = document.querySelector("input[name='Password']").value;
-            const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
-
-            // Data yang akan dikirim ke server
-            const datajson = {
-                Email: getEmail,
-                Name: getName,
-                Password: getPassword,
-                PhoneNumber: getPhoneNumber,
-            };
-
-            // Konfigurasi request
-            const requestOptions = {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json", // Hanya gunakan header yang valid
-                },
-                body: JSON.stringify(datajson), // Konversi objek ke JSON
-            };
-
-            try {
-                // Kirim data ke server
-                const response = await fetch(backend.register, requestOptions);
-                const result = await response.json();
-
-                if (response.status === 200) {
-                    Swal.fire({
-                        title: "Pendaftaran Berhasil",
-                        text: "Silakan login menggunakan WhatsAuth untuk melanjutkan.",
-                        icon: "success",
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "/login"; // Ganti dengan URL halaman login
-                        }
-                    });
-                } else {
-                    Swal.fire("Gagal Mendaftar", result.message || "Terjadi kesalahan.", "info");
+        if (response.status === 200) {
+            Swal.fire({
+                title: "Pendaftaran Berhasil",
+                text: "Silakan login menggunakan WhatsAuth untuk melanjutkan.",
+                icon: "success",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/login"; // Ganti dengan URL halaman login
                 }
-            } catch (error) {
-                console.error(error);
-                Swal.fire("Error", "Something went wrong!", "error");
-            }
-        });
+            });
+        } else {
+            Swal.fire("Gagal Mendaftar", result.message || "Terjadi kesalahan.", "info");
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire("Error", "Something went wrong!", "error");
     }
 });
