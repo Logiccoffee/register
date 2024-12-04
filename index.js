@@ -11,7 +11,7 @@ function required(value, message) {
 
 // Endpoint backend
 const backend = {
-    register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register", // Ganti dengan URL backend Anda
+    register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
 };
 
 // Menangani klik pada tombol daftar
@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const emailError = required(getEmail, "Email wajib diisi");
         const nameError = required(getName, "Nama wajib diisi");
         const passwordError = required(getPassword, "Password wajib diisi");
-        const phoneError = validatePhoneNumber(getPhoneNumber)
+        const phoneError = getPhoneNumber && validatePhoneNumber(getPhoneNumber)
             ? true
             : "Nomor telepon tidak valid. Harap gunakan format internasional.";
 
