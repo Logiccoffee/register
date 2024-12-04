@@ -1,5 +1,4 @@
 import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.js';
-import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
 import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
 // Fungsi untuk validasi required
@@ -19,14 +18,6 @@ function isPhone(value, message) {
     return true;
 }
 
-// Fungsi untuk mengganti 08 dengan 628
-function formatPhoneNumber(phoneNumber) {
-    if (phoneNumber.startsWith("08")) {
-        return `62${phoneNumber.slice(1)}`;
-    }
-    return phoneNumber;
-}
-
 // Fungsi untuk menangani pendaftaran user
 document.addEventListener("DOMContentLoaded", function () {
     const backend = {
@@ -36,23 +27,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const registerForm = document.querySelector(".register-form");
 
     if (registerForm) {
-        registerForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
+        // Validasi dan format nomor telepon saat pengguna mengetik
+        const phoneNumberInput = document.querySelector("input[name='PhoneNumber']");
+        phoneNumberInput.addEventListener("input", () => {
+            validatePhoneNumber(phoneNumberInput); // Format nomor telepon menggunakan library
+            if (phoneNumberInput.value.startsWith("08")) {
+                phoneNumberInput.value = phoneNumberInput.value.replace(/^08/, "628");
+            }
+        });
 
+        // Fungsi untuk submit form
+        onClick("register-button", async () => {
             // Ambil nilai input form
             const getEmail = document.querySelector("input[name='Email']").value;
             const getName = document.querySelector("input[name='Name']").value;
             const getPassword = document.querySelector("input[name='Password']").value;
-            let getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
-
-            // Validasi dan format nomor telepon
-            getPhoneNumber = formatPhoneNumber(getPhoneNumber);
-
-            const isValidPhoneNumber = validatePhoneNumber(getPhoneNumber);
-            if (!isValidPhoneNumber) {
-                Swal.fire("Nomor Telepon Tidak Valid", "Masukkan nomor telepon yang benar!", "warning");
-                return;
-            }
+            const getPhoneNumber = phoneNumberInput.value;
 
             // Data yang akan dikirim ke server
             const datajson = {
@@ -66,9 +56,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const requestOptions = {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json", // Hanya gunakan header yang valid
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify(datajson), // Konversi objek ke JSON
+                body: JSON.stringify(datajson),
             };
 
             try {
@@ -94,13 +84,5 @@ document.addEventListener("DOMContentLoaded", function () {
                 Swal.fire("Error", "Something went wrong!", "error");
             }
         });
-
-        // Tambahkan fungsi untuk mengganti nomor telepon secara otomatis saat pengguna mengetik
-        const phoneInput = document.querySelector("input[name='PhoneNumber']");
-        if (phoneInput) {
-            onClick(phoneInput, () => {
-                phoneInput.value = formatPhoneNumber(phoneInput.value);
-            });
-        }
     }
 });
