@@ -43,9 +43,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const emailError = required(getEmail, "Email wajib diisi");
         const nameError = required(getName, "Nama wajib diisi");
         const passwordError = required(getPassword, "Password wajib diisi");
-        const phoneError = getPhoneNumber && validatePhoneNumber(getPhoneNumber)
-            ? true
-            : "Nomor telepon tidak valid. Harap gunakan format internasional.";
+        const phoneError =
+            getPhoneNumber && getPhoneNumber.trim() !== "" && validatePhoneNumber(getPhoneNumber)
+                ? true
+                : "Nomor telepon tidak valid. Harap gunakan format internasional.";
 
         if (emailError !== true || nameError !== true || passwordError !== true || phoneError !== true) {
             Swal.fire(
