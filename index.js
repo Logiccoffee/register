@@ -2,47 +2,28 @@ import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.j
 import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
 import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
-// Fungsi untuk validasi required
-function required(value, message) {
-    if (!value || value.trim() === "") {
-        return message;
-    }
-    return true;
-}
-
 // Fungsi untuk validasi nomor telepon
-function isPhone(value, message) {
-    const phoneRegex = /^62[0-9]{8,15}$/;
-    if (!phoneRegex.test(value)) {
-        return message;
-    }
-    return true;
-}
-
-// Fungsi untuk memvalidasi dan mengonversi nomor telepon
-function isPhone(value, message) {
-    // Cek jika nomor dimulai dengan "08" dan ubah ke "62"
+function validateAndConvertPhone(value) {
+    // Jika nomor dimulai dengan "08", ubah menjadi "62"
     if (value.startsWith("08")) {
         value = "62" + value.slice(1);
     }
 
-    // Gunakan validatePhoneNumber untuk memastikan format setelah diubah
+    // Validasi format menggunakan validatePhoneNumber dari jscroot
     if (!validatePhoneNumber(value)) {
-        return message;
+        return { valid: false, value }; // Tidak valid
     }
 
-    // Update input agar data di form berubah ke format baru
-    document.querySelector("input[name='PhoneNumber']").value = value;
-
-    return true;
+    return { valid: true, value }; // Nomor valid dan terkonversi
 }
-
 
 // Fungsi untuk menangani pendaftaran user
 document.addEventListener("DOMContentLoaded", function () {
     const backend = {
         register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register", // Ganti dengan URL endpoint backend sebenarnya
     };
+
+    console.log("Register endpoint:", backend.register);
 
     const registerForm = document.querySelector(".register-form");
 
@@ -54,7 +35,18 @@ document.addEventListener("DOMContentLoaded", function () {
             const getEmail = document.querySelector("input[name='Email']").value;
             const getName = document.querySelector("input[name='Name']").value;
             const getPassword = document.querySelector("input[name='Password']").value;
-            const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
+            let getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
+
+            // Validasi nomor telepon
+            const phoneValidation = validateAndConvertPhone(getPhoneNumber);
+            if (!phoneValidation.valid) {
+                Swal.fire("Error", "Nomor telepon tidak valid!", "error");
+                return;
+            }
+
+            // Perbarui nilai nomor telepon dengan format baru
+            getPhoneNumber = phoneValidation.value;
+            document.querySelector("input[name='PhoneNumber']").value = getPhoneNumber;
 
             // Data yang akan dikirim ke server
             const datajson = {
