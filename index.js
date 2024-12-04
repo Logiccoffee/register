@@ -2,49 +2,29 @@ import { onClick } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/element.j
 import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
 import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
-// Fungsi untuk validasi required
-function required(value, message) {
-    if (!value || value.trim() === "") {
-        return message;
-    }
-    return true;
-}
-
-// Fungsi untuk validasi nomor telepon
-function isPhone(value, message) {
-    const phoneRegex = /^62[0-9]{8,15}$/;
-    if (!phoneRegex.test(value)) {
-        return message;
-    }
-    return true;
-}
-
-// Fungsi untuk menangani pendaftaran user
 document.addEventListener("DOMContentLoaded", function () {
     const backend = {
         register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register", // Ganti dengan URL endpoint backend sebenarnya
     };
 
     const registerForm = document.querySelector(".register-form");
-    const registerButton = document.getElementById("register-button"); // Ambil tombol berdasarkan ID
 
-    if (registerForm && registerButton) {
-        // Gunakan onClick untuk tombol daftar
-        onClick(registerButton, async () => {
+    if (registerForm) {
+        // Event submit untuk form
+        registerForm.addEventListener("submit", async (e) => {
+            e.preventDefault(); // Mencegah form reload
+
             // Ambil nilai input form
             const getEmail = document.querySelector("input[name='Email']").value;
             const getName = document.querySelector("input[name='Name']").value;
             const getPassword = document.querySelector("input[name='Password']").value;
             const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
 
-            // Validasi data
-            const emailError = required(getEmail, "Email tidak boleh kosong");
-            const nameError = required(getName, "Nama tidak boleh kosong");
-            const passwordError = required(getPassword, "Password tidak boleh kosong");
-            const phoneError = isPhone(getPhoneNumber, "Nomor telepon tidak valid. Gunakan format 628xxx.");
-
-            if (emailError !== true || nameError !== true || passwordError !== true || phoneError !== true) {
-                Swal.fire("Validasi Gagal", [emailError, nameError, passwordError, phoneError].filter(e => e !== true).join("\n"), "error");
+            // Validasi sederhana
+            if (!required(getEmail, "Email tidak boleh kosong!") ||
+                !required(getName, "Nama tidak boleh kosong!") ||
+                !isPhone(getPhoneNumber, "Nomor telepon tidak valid!")) {
+                Swal.fire("Error", "Data yang Anda masukkan tidak valid!", "error");
                 return;
             }
 
@@ -60,9 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const requestOptions = {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/json", // Hanya gunakan header yang valid
                 },
-                body: JSON.stringify(datajson),
+                body: JSON.stringify(datajson), // Konversi objek ke JSON
             };
 
             try {
@@ -88,5 +68,31 @@ document.addEventListener("DOMContentLoaded", function () {
                 Swal.fire("Error", "Something went wrong!", "error");
             }
         });
+
+        // Gunakan onClick untuk tombol (jika diperlukan untuk keperluan debugging)
+        onClick("#register-button", () => {
+            console.log("Register button clicked!");
+        });
+    } else {
+        console.error("Register form not found!");
     }
 });
+
+// Fungsi untuk validasi required
+function required(value, message) {
+    if (!value || value.trim() === "") {
+        console.error(message);
+        return false;
+    }
+    return true;
+}
+
+// Fungsi untuk validasi nomor telepon
+function isPhone(value, message) {
+    const phoneRegex = /^62[0-9]{8,15}$/;
+    if (!phoneRegex.test(value)) {
+        console.error(message);
+        return false;
+    }
+    return true;
+}
