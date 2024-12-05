@@ -1,6 +1,6 @@
-import { postJSON } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@0.1.8/api.js';
+import { validatePhoneNumber } from 'https://cdn.jsdelivr.net/gh/jscroot/lib@main/validate.js';
 
-// Fungsi validasi input wajib diisi
+// Fungsi untuk validasi required
 function required(value, message) {
     if (!value || value.trim() === "") {
         return message;
@@ -8,90 +8,88 @@ function required(value, message) {
     return true;
 }
 
-// Endpoint backend
-const backend = {
-    register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register",
-};
+// Fungsi untuk validasi nomor telepon
+function isPhone(value, message) {
+    const phoneRegex = /^62[0-9]{8,15}$/;
+    if (!phoneRegex.test(value)) {
+        return message;
+    }
+    return true;
+}
 
-// Menangani klik pada tombol daftar
-document.addEventListener("DOMContentLoaded", () => {
-    const registerButton = document.querySelector("#register-button");
+// Menambahkan validasi langsung saat mengetik di input nomor telepon
+document.addEventListener("DOMContentLoaded", function () {
+    const phoneInput = document.querySelector(".validate-phone");
 
-    if (!registerButton) {
-        console.error("Tombol daftar tidak ditemukan.");
-        return;
+    if (phoneInput) {
+        phoneInput.addEventListener("input", function () {
+            validatePhoneNumber(phoneInput);
+        });
     }
 
-    registerButton.addEventListener("click", async (e) => {
-        e.preventDefault(); // Mencegah submit form default
+    // Fungsi untuk menangani pendaftaran user
+    const backend = {
+        register: "https://asia-southeast2-awangga.cloudfunctions.net/logiccoffee/auth/register", // Ganti dengan URL endpoint backend sebenarnya
+    };
 
-        const registerForm = document.querySelector(".register-form");
+    const registerForm = document.querySelector(".register-form");
 
-        if (!registerForm) {
-            Swal.fire("Error", "Formulir pendaftaran tidak ditemukan.", "error");
-            return;
-        }
+    if (registerForm) {
+        registerForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        // Ambil nilai input form
-        const getEmail = document.querySelector("input[name='Email']").value;
-        const getName = document.querySelector("input[name='Name']").value;
-        const getPassword = document.querySelector("input[name='Password']").value;
-        const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
+            // Ambil nilai input form
+            const getEmail = document.querySelector("input[name='Email']").value;
+            const getName = document.querySelector("input[name='Name']").value;
+            const getPassword = document.querySelector("input[name='Password']").value;
+            const getPhoneNumber = document.querySelector("input[name='PhoneNumber']").value;
 
-        // Validasi input
-        const emailError = required(getEmail, "Email wajib diisi");
-        const nameError = required(getName, "Nama wajib diisi");
-        const passwordError = required(getPassword, "Password wajib diisi");
+            // Validasi nomor telepon
+            const phoneValidation = isPhone(getPhoneNumber, "Nomor telepon harus menggunakan format 62xxxxxxxxx");
+            if (phoneValidation !== true) {
+                Swal.fire("Validasi Gagal", phoneValidation, "error");
+                return;
+            }
 
-        if (emailError !== true || nameError !== true || passwordError !== true) {
-            Swal.fire(
-                "Error Validasi",
-                [emailError, nameError, passwordError]
-                    .filter((msg) => msg !== true)
-                    .join("\n"),
-                "warning"
-            );
-            return;
-        }
+            // Data yang akan dikirim ke server
+            const datajson = {
+                Email: getEmail,
+                Name: getName,
+                Password: getPassword,
+                PhoneNumber: getPhoneNumber,
+            };
 
-        // Data yang akan dikirim ke backend
-        const datajson = {
-            Email: getEmail,
-            Name: getName,
-            Password: getPassword,
-            PhoneNumber: getPhoneNumber, // Nomor telepon tidak divalidasi lagi
-        };
-
-        try {
-            // Gunakan fetch untuk request
-            const response = await fetch(backend.register, {
+            // Konfigurasi request
+            const requestOptions = {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json", // Set header yang benar
+                    "Content-Type": "application/json", // Hanya gunakan header yang valid
                 },
-                body: JSON.stringify(datajson),
-            });
+                body: JSON.stringify(datajson), // Konversi objek ke JSON
+            };
 
-            if (response.ok) {
+            try {
+                // Kirim data ke server
+                const response = await fetch(backend.register, requestOptions);
                 const result = await response.json();
-                Swal.fire({
-                    title: "Pendaftaran Berhasil",
-                    text: "Silakan login menggunakan WhatsAuth untuk melanjutkan.",
-                    icon: "success",
-                }).then(() => {
-                    window.location.href = "/login"; // Ganti dengan URL halaman login
-                });
-            } else {
-                const error = await response.json();
-                Swal.fire(
-                    "Error",
-                    error.message || "Terjadi kesalahan pada server.",
-                    "error"
-                );
+
+                if (response.status === 200) {
+                    Swal.fire({
+                        title: "Pendaftaran Berhasil",
+                        text: "Silakan login menggunakan WhatsAuth untuk melanjutkan.",
+                        icon: "success",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "/login"; // Ganti dengan URL halaman login
+                        }
+                    });
+                } else {
+                    Swal.fire("Gagal Mendaftar", result.message || "Terjadi kesalahan.", "info");
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire("Error", "Something went wrong!", "error");
             }
-        } catch (error) {
-            console.error("Error:", error);
-            Swal.fire("Error", "Gagal menghubungi server. Periksa koneksi Anda.", "error");
-        }
-    });
+        });
+    }
 });
