@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         }
                     });
                 } else {
-                    Swal.fire("Gagal Mendaftar", result.message || "Terjadi kesalahan.", "info");
+                    Swal.fire("Silahkan gunakan email atau nomor WhatsApp yang berbeda", result.message || "Email atau Nomor WhatsApp sudah terdaftar.", "info");
                 }
             } catch (error) {
                 console.error(error);
